@@ -6,7 +6,7 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 
-export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
   registerObjectStorageRoutes(app);
 
@@ -16,6 +16,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       search: req.query.search as string,
       location: req.query.location as string,
       type: req.query.type as string,
+      category: req.query.category as string,
+      minSalary: req.query.minSalary ? Number(req.query.minSalary) : undefined,
     };
     const jobs = await storage.getJobs(filters);
     res.json(jobs);
@@ -51,6 +53,22 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(updatedJob);
   });
 
+  app.post(api.jobs.save.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== "job_seeker") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const saved = await storage.saveJob(req.user!.id, Number(req.params.id));
+    res.json({ saved });
+  });
+
+  app.get(api.jobs.saved.path, async (req, res) => {
+    if (!req.isAuthenticated() || req.user!.role !== "job_seeker") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const jobs = await storage.getSavedJobs(req.user!.id);
+    res.json(jobs);
+  });
+
   // Applications
   app.post(api.applications.create.path, async (req, res) => {
     if (!req.isAuthenticated() || req.user!.role !== "job_seeker") {
@@ -58,11 +76,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     }
     const input = api.applications.create.input.parse(req.body);
     
-    // Check if job exists
     const job = await storage.getJob(input.jobId);
     if (!job) return res.status(404).json({ message: "Job not found" });
-
-    // Check if already applied? (Optional logic)
 
     const app = await storage.createApplication({
       ...input,
@@ -119,6 +134,8 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     res.json(stats);
   });
 
+  const httpServer = createServer(app);
+
   // Seed Data
   if (app.get("env") !== "production") {
     await seedDatabase();
@@ -131,9 +148,6 @@ async function seedDatabase() {
   const existingUsers = await storage.getUserByUsername("admin");
   if (!existingUsers) {
     console.log("Seeding database...");
-    
-    // Create Admin
-    // Password: admin123 (hashed)
     const adminPassword = "c9d9d201083981882f3424681628173468571404c00492211905819779357422f281203020959223075841793237145701822830303893325608240409026408.83d65011666497123959828238191986";
     await storage.createUser({
       username: "admin",
@@ -144,12 +158,6 @@ async function seedDatabase() {
       bio: "Platform Administrator",
     });
 
-    // Create Recruiter
-    // Password: recruiter123 (hashed)
-    const recruiterPassword = "c9d9d201083981882f3424681628173468571404c00492211905819779357422f281203020959223075841793237145701822830303893325608240409026408.83d65011666497123959828238191986"; // reusing hash for simplicity or re-hash properly if needed. Ideally re-hash.
-    // Let's use a simple hash for seed or just rely on the fact that I can't easily generate scrypt hash here without running code.
-    // Actually, I can use the same hash for now, it's just seed data. "admin123" will be the password for everyone.
-    
     const recruiter = await storage.createUser({
       username: "recruiter",
       password: adminPassword,
@@ -159,7 +167,6 @@ async function seedDatabase() {
       bio: "Hiring top talent for TechCorp",
     });
 
-    // Create Job Seeker
     const seeker = await storage.createUser({
       username: "seeker",
       password: adminPassword,
@@ -168,42 +175,46 @@ async function seedDatabase() {
       email: "jane@example.com",
       bio: "Passionate Frontend Developer",
       title: "Frontend Developer",
+      skills: ["React", "TypeScript", "Tailwind CSS"],
     });
 
-    // Create Jobs
     const job1 = await storage.createJob({
       title: "Senior React Developer",
       company: "TechCorp",
-      description: "We are looking for an experienced React developer to join our team. You will be working on cutting-edge web applications.",
-      requirements: "- 5+ years of experience with React\n- Strong TypeScript skills\n- Experience with Node.js is a plus",
-      salary: 120000,
+      description: "We are looking for an experienced React developer to join our team.",
+      requirements: "- 5+ years of experience with React\n- Strong TypeScript skills",
+      salaryMin: 120000,
+      salaryMax: 160000,
+      category: "Software Development",
       location: "Remote",
       type: "Full-time",
       recruiterId: recruiter.id,
       status: "open",
+      skills: ["React", "TypeScript"],
     });
 
     await storage.createJob({
       title: "Backend Engineer",
       company: "TechCorp",
       description: "Join our backend team to build scalable APIs.",
-      requirements: "- Experience with Node.js and PostgreSQL\n- Knowledge of microservices architecture",
-      salary: 115000,
+      requirements: "- Experience with Node.js and PostgreSQL",
+      salaryMin: 110000,
+      salaryMax: 150000,
+      category: "Software Development",
       location: "New York, NY",
       type: "Full-time",
       recruiterId: recruiter.id,
       status: "open",
+      skills: ["Node.js", "PostgreSQL"],
     });
 
-    // Create Application
     await storage.createApplication({
       jobId: job1.id,
       candidateId: seeker.id,
-      coverLetter: "I am very interested in this position. I have 6 years of React experience.",
+      coverLetter: "I am very interested in this position.",
       status: "pending",
     });
 
     console.log("Database seeded!");
   }
 }
-

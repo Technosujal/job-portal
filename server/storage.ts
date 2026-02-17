@@ -1,7 +1,6 @@
-import { users, jobs, applications, type User, type InsertUser, type Job, type InsertJob, type Application, type InsertApplication } from "@shared/schema";
+import { users, jobs, applications, savedJobs, type User, type InsertUser, type Job, type InsertJob, type Application, type InsertApplication } from "@shared/schema";
 import { db } from "./db";
-import { eq, ilike, and, count, desc } from "drizzle-orm";
-
+import { eq, ilike, and, count, desc, gte, inArray } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -10,7 +9,6 @@ const MemoryStore = createMemoryStore(session);
 export interface IStorage {
   sessionStore: session.Store;
   // Users
-
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -19,9 +17,11 @@ export interface IStorage {
   // Jobs
   createJob(job: InsertJob): Promise<Job>;
   getJob(id: number): Promise<Job | undefined>;
-  getJobs(filters?: { search?: string, location?: string, type?: string }): Promise<Job[]>;
+  getJobs(filters?: { search?: string, location?: string, type?: string, category?: string, minSalary?: number }): Promise<Job[]>;
   updateJob(id: number, job: Partial<InsertJob> & { status?: "open" | "closed" }): Promise<Job>;
   deleteJob(id: number): Promise<void>;
+  saveJob(userId: number, jobId: number): Promise<boolean>;
+  getSavedJobs(userId: number): Promise<Job[]>;
 
   // Applications
   createApplication(app: InsertApplication): Promise<Application>;
@@ -44,7 +44,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Users
-
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -76,7 +75,7 @@ export class DatabaseStorage implements IStorage {
     return job;
   }
 
-  async getJobs(filters?: { search?: string, location?: string, type?: string }): Promise<Job[]> {
+  async getJobs(filters?: { search?: string, location?: string, type?: string, category?: string, minSalary?: number }): Promise<Job[]> {
     const conditions = [];
     if (filters?.search) {
       conditions.push(ilike(jobs.title, `%${filters.search}%`));
@@ -87,8 +86,13 @@ export class DatabaseStorage implements IStorage {
     if (filters?.type) {
       conditions.push(eq(jobs.type, filters.type));
     }
+    if (filters?.category) {
+      conditions.push(eq(jobs.category, filters.category));
+    }
+    if (filters?.minSalary) {
+      conditions.push(gte(jobs.salaryMax, filters.minSalary));
+    }
 
-    // Default to open jobs unless filtering specifically? actually list all open jobs first
     conditions.push(eq(jobs.status, "open"));
 
     return await db.select().from(jobs).where(and(...conditions)).orderBy(desc(jobs.postedAt));
@@ -101,6 +105,25 @@ export class DatabaseStorage implements IStorage {
 
   async deleteJob(id: number): Promise<void> {
     await db.delete(jobs).where(eq(jobs.id, id));
+  }
+
+  async saveJob(userId: number, jobId: number): Promise<boolean> {
+    const [existing] = await db.select().from(savedJobs).where(and(eq(savedJobs.userId, userId), eq(savedJobs.jobId, jobId)));
+    if (existing) {
+      await db.delete(savedJobs).where(and(eq(savedJobs.userId, userId), eq(savedJobs.jobId, jobId)));
+      return false;
+    } else {
+      await db.insert(savedJobs).values({ userId, jobId });
+      return true;
+    }
+  }
+
+  async getSavedJobs(userId: number): Promise<Job[]> {
+    const saved = await db.select().from(savedJobs).where(eq(savedJobs.userId, userId));
+    if (saved.length === 0) return [];
+    
+    const jobIds = saved.map(s => s.jobId);
+    return await db.select().from(jobs).where(inArray(jobs.id, jobIds));
   }
 
   // Applications

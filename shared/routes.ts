@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { insertUserSchema, insertJobSchema, insertApplicationSchema, users, jobs, applications } from "./schema";
+import { insertUserSchema, insertJobSchema, insertApplicationSchema, users, jobs, applications, savedJobs } from "./schema";
 
 export const errorSchemas = {
   validation: z.object({
@@ -55,6 +55,15 @@ export const api = {
         401: errorSchemas.unauthorized,
       },
     },
+    update: {
+      method: "PATCH" as const,
+      path: "/api/user" as const,
+      input: insertUserSchema.partial(),
+      responses: {
+        200: z.custom<typeof users.$inferSelect>(),
+        401: errorSchemas.unauthorized,
+      },
+    },
   },
   jobs: {
     list: {
@@ -64,6 +73,8 @@ export const api = {
         search: z.string().optional(),
         location: z.string().optional(),
         type: z.string().optional(),
+        category: z.string().optional(),
+        minSalary: z.coerce.number().optional(),
       }).optional(),
       responses: {
         200: z.array(z.custom<typeof jobs.$inferSelect>()),
@@ -97,6 +108,22 @@ export const api = {
         404: errorSchemas.notFound,
       },
     },
+    save: {
+      method: "POST" as const,
+      path: "/api/jobs/:id/save" as const,
+      responses: {
+        200: z.object({ saved: z.boolean() }),
+        401: errorSchemas.unauthorized,
+      },
+    },
+    saved: {
+      method: "GET" as const,
+      path: "/api/jobs/saved" as const,
+      responses: {
+        200: z.array(z.custom<typeof jobs.$inferSelect>()),
+        401: errorSchemas.unauthorized,
+      },
+    },
   },
   applications: {
     create: {
@@ -115,8 +142,6 @@ export const api = {
     list: {
       method: "GET" as const,
       path: "/api/applications" as const,
-      // For recruiters: list apps for a job (query param jobId)
-      // For seekers: list my apps (no params)
       input: z.object({
         jobId: z.number().optional(),
       }).optional(),
