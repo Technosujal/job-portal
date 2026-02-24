@@ -91,7 +91,7 @@ export const api = {
     create: {
       method: "POST" as const,
       path: "/api/jobs" as const,
-      input: insertJobSchema,
+      input: insertJobSchema.omit({ recruiterId: true }),
       responses: {
         201: z.custom<typeof jobs.$inferSelect>(),
         401: errorSchemas.unauthorized,
@@ -122,6 +122,21 @@ export const api = {
       responses: {
         200: z.array(z.custom<typeof jobs.$inferSelect>()),
         401: errorSchemas.unauthorized,
+      },
+    },
+    scoreCv: {
+      method: "POST" as const,
+      path: "/api/jobs/:id/score-cv" as const,
+      responses: {
+        200: z.object({
+          score: z.number(),
+          summary: z.string(),
+          matchingSkills: z.array(z.string()),
+          missingSkills: z.array(z.string()),
+          recommendations: z.array(z.string()),
+        }),
+        401: errorSchemas.unauthorized,
+        404: errorSchemas.notFound,
       },
     },
   },
@@ -162,6 +177,22 @@ export const api = {
       },
     },
   },
+  recruiter: {
+    stats: {
+      method: "GET" as const,
+      path: "/api/recruiter/stats" as const,
+      responses: {
+        200: z.object({
+          totalJobs: z.number(),
+          totalApplications: z.number(),
+          activeListings: z.number(),
+          statusDistribution: z.array(z.object({ status: z.string(), count: z.number() })),
+          topJobs: z.array(z.object({ title: z.string(), count: z.number() })),
+        }),
+        401: errorSchemas.unauthorized,
+      },
+    },
+  },
   stats: {
     get: {
       method: "GET" as const,
@@ -178,6 +209,12 @@ export const api = {
     },
   },
 };
+
+export type CreateJobRequest = z.infer<typeof insertJobSchema>;
+export type UpdateJobRequest = z.infer<typeof api.jobs.update.input>;
+
+export type LoginRequest = z.infer<typeof api.auth.login.input>;
+export type RegisterRequest = z.infer<typeof api.auth.register.input>;
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {
   let url = path;

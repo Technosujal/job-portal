@@ -1,24 +1,24 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role", { enum: ["job_seeker", "recruiter", "admin"] }).notNull().default("job_seeker"),
+  role: text("role").$type<"job_seeker" | "recruiter" | "admin">().notNull().default("job_seeker"),
   name: text("name").notNull(),
   email: text("email").notNull(),
   bio: text("bio"),
   title: text("title"),
   resumeUrl: text("resume_url"),
-  skills: text("skills").array(), // For job seekers
+  skills: text("skills", { mode: "json" }).$type<string[]>(), // Automatic JSON handling
   companyLogo: text("company_logo"), // For recruiters
   companyWebsite: text("company_website"), // For recruiters
 });
 
-export const jobs = pgTable("jobs", {
-  id: serial("id").primaryKey(),
+export const jobs = sqliteTable("jobs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   company: text("company").notNull(),
   description: text("description").notNull(),
@@ -26,28 +26,28 @@ export const jobs = pgTable("jobs", {
   salaryMin: integer("salary_min"),
   salaryMax: integer("salary_max"),
   category: text("category").notNull().default("Software Development"),
-  skills: text("skills").array(), // Required skills
+  skills: text("skills", { mode: "json" }).$type<string[]>(), // Automatic JSON handling
   location: text("location").notNull(),
   type: text("type").notNull(),
   recruiterId: integer("recruiter_id").notNull(),
-  status: text("status", { enum: ["open", "closed"] }).notNull().default("open"),
-  postedAt: timestamp("posted_at").defaultNow(),
+  status: text("status").$type<"open" | "closed">().notNull().default("open"),
+  postedAt: integer("posted_at", { mode: "timestamp" }).default(new Date()),
 });
 
-export const applications = pgTable("applications", {
-  id: serial("id").primaryKey(),
+export const applications = sqliteTable("applications", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   jobId: integer("job_id").notNull(),
   candidateId: integer("candidate_id").notNull(),
-  status: text("status", { enum: ["pending", "reviewed", "interview", "offered", "rejected"] }).notNull().default("pending"),
+  status: text("status").$type<"pending" | "reviewed" | "interview" | "offered" | "rejected">().notNull().default("pending"),
   coverLetter: text("cover_letter"),
-  appliedAt: timestamp("applied_at").defaultNow(),
+  appliedAt: integer("applied_at", { mode: "timestamp" }).default(new Date()),
 });
 
-export const savedJobs = pgTable("saved_jobs", {
-  id: serial("id").primaryKey(),
+export const savedJobs = sqliteTable("saved_jobs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").notNull(),
   jobId: integer("job_id").notNull(),
-  savedAt: timestamp("saved_at").defaultNow(),
+  savedAt: integer("saved_at", { mode: "timestamp" }).default(new Date()),
 });
 
 // Zod Schemas
@@ -68,14 +68,12 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertJobSchema = createInsertSchema(jobs).omit({ 
   id: true, 
   postedAt: true,
-  recruiterId: true 
 });
 
 export const insertApplicationSchema = createInsertSchema(applications).omit({ 
   id: true, 
   appliedAt: true,
   status: true,
-  candidateId: true
 });
 
 // Types

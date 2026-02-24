@@ -3,8 +3,22 @@ import { api, buildUrl, type CreateJobRequest, type UpdateJobRequest } from "@sh
 import { useToast } from "@/hooks/use-toast";
 
 // Fetch all jobs with optional filters
-export function useJobs(filters?: { search?: string; location?: string; type?: string }) {
-  const queryString = filters ? new URLSearchParams(filters as Record<string, string>).toString() : "";
+export function useJobs(filters?: { 
+  search?: string; 
+  location?: string; 
+  type?: string;
+  category?: string;
+  minSalary?: number;
+}) {
+  const queryParams = new URLSearchParams();
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== "") {
+        queryParams.append(key, value.toString());
+      }
+    });
+  }
+  const queryString = queryParams.toString();
   const queryKey = [api.jobs.list.path, queryString];
 
   return useQuery({

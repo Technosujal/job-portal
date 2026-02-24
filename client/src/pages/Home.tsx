@@ -30,6 +30,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-32">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-30 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full" />
+          <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-accent/20 blur-[100px] rounded-full" />
+        </div>
         
         <div className="container px-4 md:px-6">
           <motion.div 
@@ -39,25 +43,25 @@ export default function Home() {
             className="flex flex-col items-center text-center space-y-8"
           >
             <motion.div variants={item} className="space-y-4 max-w-3xl">
-              <h1 className="text-4xl md:text-6xl font-display font-bold tracking-tighter text-foreground bg-clip-text">
+              <h1 className="text-4xl md:text-7xl font-display font-bold tracking-tighter text-foreground leading-[1.1]">
                 Find your dream job <br/>
-                <span className="text-primary">build your future</span>
+                <span className="animated-gradient-text">build your future</span>
               </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
+              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl lg:text-2xl leading-relaxed">
                 Connect with top companies and startups. Whether you're a developer, designer, or marketer, your next opportunity awaits.
               </p>
             </motion.div>
 
             <motion.div variants={item} className="flex flex-col sm:flex-row gap-4">
               <Link href="/jobs">
-                <Button size="lg" className="h-12 px-8 text-lg shadow-lg shadow-primary/20">
-                  <Search className="mr-2 h-5 w-5" />
+                <Button size="lg" className="h-14 px-10 text-lg shadow-xl shadow-primary/25 hover:shadow-2xl hover:-translate-y-1 transition-all rounded-2xl group">
+                  <Search className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Browse Jobs
                 </Button>
               </Link>
               {!user && (
                 <Link href="/register">
-                  <Button size="lg" variant="outline" className="h-12 px-8 text-lg">
+                  <Button size="lg" variant="outline" className="h-14 px-10 text-lg rounded-2xl backdrop-blur-sm bg-background/50 border-primary/20 hover:border-primary/40 transition-all hover:bg-primary/5">
                     Create Profile
                   </Button>
                 </Link>
@@ -65,28 +69,24 @@ export default function Home() {
             </motion.div>
             
             {/* Stats */}
-            <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 w-full max-w-4xl">
-              <div className="flex flex-col items-center p-6 rounded-2xl bg-card border shadow-sm">
-                <div className="p-3 rounded-full bg-primary/10 text-primary mb-4">
-                  <Briefcase className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold">5,000+</h3>
-                <p className="text-muted-foreground">Active Jobs</p>
-              </div>
-              <div className="flex flex-col items-center p-6 rounded-2xl bg-card border shadow-sm">
-                <div className="p-3 rounded-full bg-primary/10 text-primary mb-4">
-                  <Users className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold">10k+</h3>
-                <p className="text-muted-foreground">Companies</p>
-              </div>
-              <div className="flex flex-col items-center p-6 rounded-2xl bg-card border shadow-sm">
-                <div className="p-3 rounded-full bg-primary/10 text-primary mb-4">
-                  <Globe className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold">120+</h3>
-                <p className="text-muted-foreground">Countries</p>
-              </div>
+            <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 w-full max-w-5xl">
+              {[
+                { icon: Briefcase, label: "Active Jobs", value: "5,000+" },
+                { icon: Users, label: "Companies", value: "10k+" },
+                { icon: Globe, label: "Countries", value: "120+" }
+              ].map((stat, idx) => (
+                <motion.div 
+                  key={idx}
+                  whileHover={{ y: -10 }}
+                  className="flex flex-col items-center p-8 rounded-[2rem] glass-card group transition-all"
+                >
+                  <div className="p-4 rounded-2xl bg-primary/10 text-primary mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform">
+                    <stat.icon className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-3xl font-extrabold mb-1">{stat.value}</h3>
+                  <p className="text-muted-foreground font-medium">{stat.label}</p>
+                </motion.div>
+              ))}
             </motion.div>
           </motion.div>
         </div>

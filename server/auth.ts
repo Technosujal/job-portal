@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
+import { api } from "@shared/routes";
 
 const scryptAsync = promisify(scrypt);
 
@@ -93,6 +94,30 @@ export function setupAuth(app: Express) {
       res.json(req.user);
     } else {
       res.status(401).send("Unauthorized");
+    }
+  });
+
+  app.patch("/api/user", async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    try {
+      const result = api.auth.update.input.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid input", errors: result.error.errors });
+      }
+
+      const user = req.user as User;
+      const updatedUser = await storage.updateUser(user.id, result.data);
+      
+      // Update the session user
+      req.login(updatedUser, (err) => {
+        if (err) return next(err);
+        res.json(updatedUser);
+      });
+    } catch (err) {
+      next(err);
     }
   });
 }
