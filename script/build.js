@@ -50,10 +50,13 @@ async function buildAll() {
     entryPoints: ["server/index.js"],
     platform: "node",
     bundle: true,
-    format: "esm",
-    outfile: "dist/index.js",
+    format: "cjs",
+    outfile: "dist/index.cjs",
     define: {
       "process.env.NODE_ENV": '"production"',
+    },
+    banner: {
+      js: "const { fileURLToPath: __fileURLToPath } = require('url'); const __filename = __dirname + '/' + 'index.cjs';",
     },
     minify: true,
     external: externals,

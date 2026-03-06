@@ -3,8 +3,18 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import url from "url";
+
+let __filename;
+let __dirname;
+try {
+  __filename = url.fileURLToPath(import.meta.url);
+  __dirname = path.dirname(__filename);
+} catch (e) {
+  // Fallback for bundled CommonJS environments
+  __filename = __dirname + "/index.cjs";
+  __dirname = path.resolve(__dirname);
+}
 
 export function serveStatic(app) {
   const distPath = path.resolve(__dirname, "public");
