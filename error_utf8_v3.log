@@ -1,0 +1,62 @@
+﻿node : file:///C:/Use
+rs/ASUS/Downloads/Car
+eer-Connect/Career-Co
+nnect/shared/schema.j
+s:59
+At line:1 char:1
++ node 
+server/index.js 2>&1 
+| Out-File -FilePath 
+error_utf8_v3.log 
+-Enc ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (file://   
+ /C:/User...ed/sc    
+hema.js:59:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+  status: 
+text("status", { 
+enum: ["pending", 
+"reviewed", 
+"interview", 
+"offered", 
+"rejected"] 
+})._def.schema
+                     
+                     
+                     
+                     
+                ^
+
+TypeError: Cannot 
+read properties of 
+undefined (reading 
+'schema')
+    at file:///C:/Use
+rs/ASUS/Downloads/Car
+eer-Connect/Career-Co
+nnect/shared/schema.j
+s:59:101
+    at ModuleJob.run 
+(node:internal/module
+s/esm/module_job:271:
+25)
+    at async onImport
+.tracePromise.__proto
+__ (node:internal/mod
+ules/esm/loader:578:2
+6)
+    at async asyncRun
+EntryPointWithESMLoad
+er (node:internal/mod
+ules/run_main:116:5)
+
+Node.js v22.14.0

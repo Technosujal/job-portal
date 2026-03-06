@@ -1,0 +1,64 @@
+﻿[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+[32mΓ£ô[39m 0 modules transformed.
+node.exe : 
+[31mΓ£ù[39m Build 
+failed in 59ms
+At C:\Program Files\nod
+ejs\npx.ps1:29 char:3
++   & $NODE_EXE 
+$NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([31mΓ£ù[39m   
+  Build failed in 5    
+9ms:String) [], Re    
+moteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[31merror during 
+build:
+[31m[vite:build-html] 
+Failed to resolve 
+/src/main.tsx from C:/U
+sers/ASUS/Downloads/Car
+eer-Connect/Career-Conn
+ect/client/index.html[
+31m
+file: [36mC:/Users/ASU
+S/Downloads/Career-Conn
+ect/Career-Connect/clie
+nt/index.html[31m
+    at file:///C:/Users
+/ASUS/Downloads/Career-
+Connect/Career-Connect/
+node_modules/vite/dist/
+node/chunks/config.js:2
+3918:64
+    at async 
+Promise.all (index 0)
+    at async 
+Object.handler (file://
+/C:/Users/ASUS/Download
+s/Career-Connect/Career
+-Connect/node_modules/v
+ite/dist/node/chunks/co
+nfig.js:24015:5)
+    at async transform 
+(file:///C:/Users/ASUS/
+Downloads/Career-Connec
+t/Career-Connect/node_m
+odules/rollup/dist/es/s
+hared/node-entry.js:212
+06:16)
+    at async ModuleLoad
+er.addModuleSource (fil
+e:///C:/Users/ASUS/Down
+loads/Career-Connect/Ca
+reer-Connect/node_modul
+es/rollup/dist/es/share
+d/node-entry.js:21420:3
+6)[39m

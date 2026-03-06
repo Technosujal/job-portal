@@ -8,10 +8,10 @@
   --font-sans: "Inter", sans-serif;
   --font-display: "Space Grotesk", sans-serif;
 
-  --background: 210 40% 98%;
+  --background: 210 50% 98%;
   --foreground: 222 47% 11%;
 
-  --primary: 221 83% 53%;
+  --primary: 210 100% 50%; /* Vibrant Blue */
   --primary-foreground: 210 40% 98%;
 
   --secondary: 217 32% 17%;
@@ -20,7 +20,7 @@
   --muted: 210 40% 96%;
   --muted-foreground: 215 16% 47%;
 
-  --accent: 262 83% 58%;
+  --accent: 270 90% 60%; /* Vibrant Purple */
   --accent-foreground: 210 40% 98%;
 
   --destructive: 0 84% 60%;
@@ -28,33 +28,33 @@
 
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 221 83% 53%;
+  --ring: 210 100% 50%;
 
-  --radius: 1rem;
+  --radius: 1.25rem;
 }
 
 .dark {
-  --background: 222 47% 11%;
+  --background: 222 47% 4%;
   --foreground: 210 40% 98%;
 
-  --primary: 217 91% 60%;
+  --primary: 210 100% 55%;
   --primary-foreground: 222 47% 11%;
 
-  --secondary: 217 32% 17%;
+  --secondary: 217 32% 12%;
   --secondary-foreground: 210 40% 98%;
 
-  --muted: 217 32% 17%;
+  --muted: 217 32% 12%;
   --muted-foreground: 215 20% 65%;
 
-  --accent: 262 83% 58%;
+  --accent: 270 90% 65%;
   --accent-foreground: 210 40% 98%;
 
   --destructive: 0 62% 30%;
   --destructive-foreground: 210 40% 98%;
 
-  --border: 217 32% 17%;
-  --input: 217 32% 17%;
-  --ring: 224 76% 48%;
+  --border: 217 32% 12%;
+  --input: 217 32% 12%;
+  --ring: 210 100% 50%;
 }
 
 @layer base {
@@ -62,45 +62,38 @@
     @apply bg-background text-foreground antialiased selection:bg-primary/20;
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(at 0% 0%, hsla(221, 83%, 53%, 0.05) 0, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(262, 83%, 58%, 0.05) 0, transparent 50%),
-      radial-gradient(
-        at 100% 100%,
-        hsla(221, 83%, 53%, 0.05) 0,
-        transparent 50%
-      ),
-      radial-gradient(at 0% 100%, hsla(262, 83%, 58%, 0.05) 0, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(210, 100%, 50%, 0.1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(270, 90%, 60%, 0.1) 0, transparent 50%),
+      radial-gradient(at 50% 50%, hsla(210, 100%, 50%, 0.05) 0, transparent 70%);
     background-attachment: fixed;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tighter font-extrabold;
     font-family: var(--font-display);
-    @apply tracking-tight font-extrabold;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl ring-1 ring-black/5;
+    @apply bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] ring-1 ring-black/5;
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-95 hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none;
   }
 
-  .input-field {
-    @apply bg-background/50 backdrop-blur-sm border-border focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 outline-none;
-  }
-
-  .animated-gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-gradient;
+  .floating {
+    animation: floating 3s ease-in-out infinite;
   }
 }
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
 
 @keyframes gradient {
   0% {

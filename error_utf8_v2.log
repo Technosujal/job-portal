@@ -1,0 +1,51 @@
+﻿node : file:///C:/Use
+rs/ASUS/Downloads/Car
+eer-Connect/Career-Co
+nnect/server/auth.js:
+7
+At line:1 char:1
++ node 
+server/index.js 2>&1 
+| Out-File -FilePath 
+error_utf8_v2.log 
+-Enc ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (file://   
+ /C:/User...erver    
+/auth.js:7:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+import { api } from "
+../shared/routes.js";
+         ^^^
+SyntaxError: The 
+requested module '../
+shared/routes.js' 
+does not provide an 
+export named 'api'
+    at ModuleJob._ins
+tantiate (node:intern
+al/modules/esm/module
+_job:180:21)
+    at async 
+ModuleJob.run (node:i
+nternal/modules/esm/m
+odule_job:263:5)
+    at async onImport
+.tracePromise.__proto
+__ (node:internal/mod
+ules/esm/loader:578:2
+6)
+    at async asyncRun
+EntryPointWithESMLoad
+er (node:internal/mod
+ules/run_main:116:5)
+
+Node.js v22.14.0
