@@ -5,19 +5,20 @@ import { fileURLToPath } from "url";
 
 import url from "url";
 
-let __filename;
-let __dirname;
-try {
-  __filename = url.fileURLToPath(import.meta.url);
-  __dirname = path.dirname(__filename);
-} catch (e) {
-  // Fallback for bundled CommonJS environments
-  __filename = __dirname + "/index.cjs";
-  __dirname = path.resolve(__dirname);
-}
+const getDirname = () => {
+  if (typeof __dirname !== 'undefined') {
+    return __dirname;
+  }
+  try {
+    const filename = url.fileURLToPath(import.meta.url);
+    return path.dirname(filename);
+  } catch (e) {
+    return process.cwd();
+  }
+};
 
 export function serveStatic(app) {
-  const distPath = path.resolve(__dirname, "public");
+  const distPath = path.resolve(getDirname(), "public");
   if (!fs.existsSync(distPath)) {
     throw new Error(
       `Could find the build directory: ${distPath}, make sure to build the client first`,
