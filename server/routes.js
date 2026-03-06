@@ -72,7 +72,7 @@ export async function registerRoutes(app) {
     }
     const job = await storage.getJob(req.params.id);
     if (!job) return res.status(404).json({ message: "Job not found" });
-    if (job.recruiterId !== req.user.id && req.user.role !== "admin") {
+    if (job.recruiterId.toString() !== req.user.id && req.user.role !== "admin") {
       return res.status(403).json({ message: "Forbidden" });
     }
     
@@ -123,7 +123,7 @@ export async function registerRoutes(app) {
     if (user.role === "recruiter") {
       if (jobId) {
         const job = await storage.getJob(jobId);
-        if (!job || job.recruiterId !== user.id) {
+        if (!job || job.recruiterId.toString() !== user.id) {
           return res.status(403).json({ message: "Forbidden" });
         }
         const apps = await storage.getApplicationsByJob(jobId);
@@ -151,7 +151,7 @@ export async function registerRoutes(app) {
     if (!app) return res.status(404).json({ message: "Application not found" });
     
     const job = await storage.getJob(app.jobId);
-    if (!job || job.recruiterId !== req.user.id) {
+    if (!job || job.recruiterId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
@@ -224,7 +224,7 @@ export async function registerRoutes(app) {
     const appRecord = await storage.getApplication(req.params.id);
     if (!appRecord) return res.status(404).json({ message: "Not found" });
     const job = await storage.getJob(appRecord.jobId);
-    if (!job || job.recruiterId !== req.user.id) return res.status(403).json({ message: "Forbidden" });
+    if (!job || job.recruiterId.toString() !== req.user.id) return res.status(403).json({ message: "Forbidden" });
     const updated = await storage.updateApplicationNotes(req.params.id, result.data.notes);
     res.json(updated);
   });
@@ -239,7 +239,7 @@ export async function registerRoutes(app) {
     const appRecord = await storage.getApplication(req.params.id);
     if (!appRecord) return res.status(404).json({ message: "Not found" });
     const job = await storage.getJob(appRecord.jobId);
-    if (!job || job.recruiterId !== req.user.id) return res.status(403).json({ message: "Forbidden" });
+    if (!job || job.recruiterId.toString() !== req.user.id) return res.status(403).json({ message: "Forbidden" });
     const updated = await storage.updateApplicationInterview(req.params.id, result.data.interviewDate);
     res.json(updated);
   });
