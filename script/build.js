@@ -60,9 +60,6 @@ async function buildAll() {
     define: {
       "process.env.NODE_ENV": '"production"',
     },
-    banner: {
-      js: "const { fileURLToPath: __fileURLToPath } = require('url'); const __filename = __dirname + '/' + 'index.cjs';",
-    },
     minify: true,
     external: externals,
     logLevel: "info",
